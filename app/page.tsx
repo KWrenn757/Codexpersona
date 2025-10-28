@@ -12,13 +12,24 @@ export default function Home() {
     setErr(null); setResult(null);
     try {
       const res = await fetch('/api/persona', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ decision })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.error || 'Server error');
-      setResult(data.result);
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ decision })
+});
+
+// Try to parse JSON safely
+let data: any = null;
+try {
+  data = await res.json();
+} catch (e) {
+  throw new Error('Server did not return valid JSON');
+}
+
+if (!res.ok) {
+  throw new Error(data?.error || `Server error (${res.status})`);
+}
+
+setResult(data.result);
     } catch (e: any) {
       setErr(e.message || 'Something went wrong');
     }
